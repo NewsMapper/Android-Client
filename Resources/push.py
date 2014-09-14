@@ -1,7 +1,6 @@
 import os
-from os.path import expanduser
-home = expanduser("~")
-to_cd = home + "/AndroidStudioProjects/NewsReader"
+
+to_cd = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(to_cd)
 
 auto_pull = input('Auto-pull now? (y/anything): ')
