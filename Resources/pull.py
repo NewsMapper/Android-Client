@@ -5,4 +5,4 @@ home = expanduser("~")
 to_cd = home + "/AndroidStudioProjects/NewsReader"
 print(to_cd)
 os.chdir(to_cd)
-os.system("git pull https://github.com/newsmapper/newsmapper.github.io")
+os.system("git pull https://github.com/newsmapper/Android-Client")
