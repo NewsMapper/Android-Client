@@ -1,0 +1,1 @@
+https://github.com/NewsMapper/Android-Client/tree/master/app/src/main/java/com/example/danielmargosian/newsreader
