@@ -10,8 +10,8 @@ auto_commit = input('Commit message (type "q" to quit): ')
 if auto_commit is 'q':
 	raise SystemExit
 
+os.system("git rm -r --cached .")
 os.system("git add .")
-
 os.system("git commit -m '" + auto_commit.strip("'") + "'")
 os.system("git remote rm origin")
 os.system("git remote add origin https://github.com/NewsMapper/Android-Client")
