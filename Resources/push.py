@@ -10,9 +10,7 @@ auto_commit = input('Commit message (type "q" to quit): ')
 if auto_commit is 'q':
 	raise SystemExit
 
-files = os.listdir()
-for foo in files:
-	os.system("git add " + foo)
+os.system("git add .")
 
 os.system("git commit -m '" + auto_commit.strip("'") + "'")
 os.system("git remote rm origin")
