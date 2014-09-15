@@ -1,4 +1,4 @@
-package com.example.danielmargosian.newsreader;
+package com.example.danielmargosian.newsmapper;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

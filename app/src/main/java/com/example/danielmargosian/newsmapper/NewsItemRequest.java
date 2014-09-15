@@ -1,4 +1,4 @@
-package com.example.danielmargosian.newsreader;
+package com.example.danielmargosian.newsmapper;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;

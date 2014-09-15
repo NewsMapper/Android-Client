@@ -1,4 +1,4 @@
-package com.example.danielmargosian.newsreader;
+package com.example.danielmargosian.newsmapper;
 
 import javax.json.JsonObject;
 import javax.json.JsonValue;
@@ -21,7 +21,7 @@ public class NewsItem {
         this.title = title;
         this.url = url;
     }
-    public NewsItem (JsonObject jo)
+    public NewsItem(JsonObject jo)
     {
         publishedDate = jo.getString("publishedDate");
         publisher = jo.getString("publisher");

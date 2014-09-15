@@ -1,4 +1,4 @@
-package com.example.danielmargosian.newsreader;
+package com.example.danielmargosian.newsmapper;
 
 import android.app.Activity;
 import android.app.LoaderManager;
@@ -15,12 +15,12 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NewsScrape extends Activity implements LoaderManager.LoaderCallbacks<List<NewsItem>> {
+public class NewsMapper extends Activity implements LoaderManager.LoaderCallbacks<List<NewsItem>> {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_news_scrape);
+        setContentView(R.layout.activity_news_mapper);
         getLoaderManager().initLoader(0, null, this).forceLoad();
 
     }
@@ -28,7 +28,7 @@ public class NewsScrape extends Activity implements LoaderManager.LoaderCallback
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.news_scrape, menu);
+        getMenuInflater().inflate(R.menu.news_mapper, menu);
         return true;
     }
 

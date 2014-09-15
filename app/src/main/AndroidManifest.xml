@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.danielmargosian.newsreader" >
+    package="com.example.danielmargosian.newsmapper" >
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <application
@@ -9,7 +9,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".NewsScrape"
+            android:name="com.example.danielmargosian.newsmapper.NewsMapper"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Light.NoTitleBar">
             <intent-filter>
