@@ -1,52 +1,29 @@
 package com.example.danielmargosian.newsreader;
 
 import android.app.Activity;
+import android.app.LoaderManager;
+import android.content.AsyncTaskLoader;
+import android.content.Loader;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import javax.json.*;
 
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class NewsScrape extends Activity {
-
-    ArrayAdapter<String> newsAdapter;
-    ListView lvNews;
-    //NewsItemRequest request;
-    JsonArray newsItems;
-    List<String> titleList;
+public class NewsScrape extends Activity implements LoaderManager.LoaderCallbacks<List<NewsItem>> {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news_scrape);
-        lvNews = (ListView) findViewById((R.id.lvNews));
-        //request = new NewsItemRequest();
+        getLoaderManager().initLoader(0, null, this).forceLoad();
 
-        //request.execute();
-        titleList = new ArrayList<String>();
-        newsItems = Json.createArrayBuilder()
-                .add(Json.createObjectBuilder()
-                        .add("title", "breaking news"))
-                .add(Json.createObjectBuilder()
-                        .add("title", "lame news"))
-                .build();
-        titleList = getTitleList();
-        newsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, titleList);
-        lvNews.setAdapter((newsAdapter));
-        titleList.add("Hello world");
     }
 
     @Override
@@ -68,13 +45,27 @@ public class NewsScrape extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public List<String> getTitleList()
-    {
-        for (int i = 0; i < newsItems.size(); i++)
+    @Override
+    public AsyncTaskLoader<List<NewsItem>> onCreateLoader(int id, Bundle args) {
+        return new NewsItemRequest(this);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<NewsItem>> loader, List<NewsItem> list) {
+        List<Spanned> titleList = new ArrayList<Spanned>();
+        for (int i = 0; i < list.size(); i++)
         {
-            String t = newsItems.getJsonObject(i).getString("title");
+            Spanned t = Html.fromHtml(list.get(i).getTitle());
             titleList.add(t);
         }
-        return titleList;
+        ListView lvNews = (ListView) findViewById((R.id.lvNews));
+        ArrayAdapter<Spanned> newsAdapter = new ArrayAdapter<Spanned>(this, android.R.layout.simple_list_item_1, titleList);
+        lvNews.setAdapter((newsAdapter));
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<NewsItem>> loader) {
+        final ListView listview = (ListView) findViewById(R.id.lvNews);
+        listview.setAdapter(null);
     }
 }
