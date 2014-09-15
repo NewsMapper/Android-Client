@@ -11,7 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import javax.json.*;
 
 import java.util.ArrayList;
 import java.util.List;

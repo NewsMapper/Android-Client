@@ -15,8 +15,6 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 
-import retrofit.http.GET;
-
 /**
  * Created by danielmargosian on 9/11/14.
  */
