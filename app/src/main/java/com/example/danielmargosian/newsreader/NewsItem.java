@@ -21,13 +21,13 @@ public class NewsItem {
         this.title = title;
         this.url = url;
     }
-    public NewsItem (JsonObject jv)
+    public NewsItem (JsonObject jo)
     {
-        publishedDate = jv.getString("publishedDate");
-        publisher = jv.getString("publisher");
-        summary = jv.getString("summary");
-        title = jv.getString("title");
-        url = jv.getString("url");
+        publishedDate = jo.getString("publishedDate");
+        publisher = jo.getString("publisher");
+        summary = jo.getString("summary");
+        title = jo.getString("title");
+        url = jo.getString("url");
     }
 
     public String getPublishedDate()
