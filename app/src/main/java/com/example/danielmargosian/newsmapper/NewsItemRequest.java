@@ -21,23 +21,25 @@ import javax.json.JsonReader;
 public class NewsItemRequest extends AsyncTaskLoader<List<NewsItem>>{
 
     private InputStream is;
+    private String location;
 
-    public NewsItemRequest(Context context) {
+    public NewsItemRequest(Context context, String location) {
         super(context);
+        this.location = location;
     }
 
     @Override
     public List<NewsItem> loadInBackground() {
 
         try {
-            URL url = new URL("https://3005cb8f.ngrok.com/api/news?address=bangkok");
+            URL url = new URL("http://7a298fd8.ngrok.com/api/location?address="+location);
             is = url.openConnection().getInputStream();
         }
         catch (MalformedURLException e) {e.printStackTrace();}
         catch (IOException e) {e.printStackTrace();}
         JsonReader rdr = Json.createReader(is);
         JsonObject obj = rdr.readObject();
-        JsonArray newsArray  = obj.getJsonArray("feed");
+        JsonArray newsArray  = obj.getJsonArray("news");
         List<NewsItem> newsItems = new ArrayList<NewsItem>();
         for (int i = 0; i < newsArray.size(); i++)
             newsItems.add(new NewsItem(newsArray.getJsonObject(i)));

@@ -24,4 +24,5 @@ dependencies {
     compile 'com.squareup.retrofit:retrofit:1.6.1'
     compile files('libs/javax.json-api-1.0 (1).jar')
     compile files('libs/javax.json-1.0.4.jar')
+    compile 'com.google.android.gms:play-services:5.2.08'
 }

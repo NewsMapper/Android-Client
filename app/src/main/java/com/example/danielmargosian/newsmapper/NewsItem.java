@@ -1,5 +1,11 @@
 package com.example.danielmargosian.newsmapper;
 
+import org.json.JSONArray;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
@@ -29,7 +35,6 @@ public class NewsItem {
         title = jo.getString("title");
         url = jo.getString("url");
     }
-
     public String getPublishedDate()
     {
         return publishedDate;
