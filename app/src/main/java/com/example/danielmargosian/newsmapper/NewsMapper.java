@@ -38,9 +38,6 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news_mapper);
         mLocationClient = new LocationClient(this, this, this);
-        mCurrentLocation = mLocationClient.getLastLocation();
-        mCurrentLocation.toString();
-        getLoaderManager().initLoader(0, null, this).forceLoad();
 
     }
     @Override
@@ -194,6 +191,11 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
     public void onConnected(Bundle dataBundle) {
         // Display the connection status
         Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
+        mCurrentLocation = mLocationClient.getLastLocation();
+        double lat = mCurrentLocation.getLatitude();
+        double lon = mCurrentLocation.getLongitude();
+        location = String.valueOf(lat) + "," + String.valueOf(lon);
+        getLoaderManager().initLoader(0, null, this).forceLoad();
 
     }
     /*
