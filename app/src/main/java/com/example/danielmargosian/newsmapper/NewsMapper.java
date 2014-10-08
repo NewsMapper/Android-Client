@@ -96,6 +96,7 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
         super.onStop();
     }
 
+    //Check for Google Play Services
     // Global constants
     /*
      * Define a request code to send to Google Play services
@@ -182,6 +183,7 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
             return false;
         }
     }
+
     /*
      * Called by Location Services when the request to connect the
      * client finishes successfully. At this point, you can
