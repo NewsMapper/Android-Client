@@ -3,6 +3,7 @@ package com.example.danielmargosian.newsmapper;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.ListActivity;
 import android.app.LoaderManager;
 import android.content.AsyncTaskLoader;
 import android.content.Intent;
@@ -15,26 +16,39 @@ import android.text.Spanned;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.ErrorDialogFragment;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
 
 public class NewsMapper extends Activity implements LoaderManager.LoaderCallbacks<List<NewsItem>>, GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
 
-    Location mCurrentLocation;
-    LocationClient mLocationClient;
+    private Location mCurrentLocation;
+    private LocationClient mLocationClient;
+    private List<NewsItem> newsItems;
+    private ArrayAdapter<Spanned> newsAdapter;
+    private String location;
 
-    public String location;
+    public static final String EXTRA_URL = "com.example.danielmargosian.newsmapper.URL";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //start the activity and the location client
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news_mapper);
         mLocationClient = new LocationClient(this, this, this);
@@ -63,31 +77,51 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
         if (id == R.id.action_settings) {
             return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public AsyncTaskLoader<List<NewsItem>> onCreateLoader(int id, Bundle args) {
+        //creates new NewsItemRequest for the loader
         return new NewsItemRequest(this, location);
     }
 
     @Override
     public void onLoadFinished(Loader<List<NewsItem>> loader, List<NewsItem> list) {
+        //after done loading, make a list of html formatted titles
+        newsItems = list;
         List<Spanned> titleList = new ArrayList<Spanned>();
         for (int i = 0; i < list.size(); i++)
         {
             Spanned t = Html.fromHtml(list.get(i).getTitle());
             titleList.add(t);
         }
+        //create an ArrayAdapter using the titleList and set it to display on the listview;
+        newsAdapter = new ArrayAdapter<Spanned>(this, android.R.layout.simple_list_item_1, titleList);
         ListView lvNews = (ListView) findViewById((R.id.lvNews));
-        ArrayAdapter<Spanned> newsAdapter = new ArrayAdapter<Spanned>(this, android.R.layout.simple_list_item_1, titleList);
-        lvNews.setAdapter((newsAdapter));
+        lvNews.setAdapter(newsAdapter);
+        //when article title is clicked, open article in new webview activity
+        lvNews.setOnItemClickListener(
+                new AdapterView.OnItemClickListener()
+                {
+                    @Override
+                    public void onItemClick(AdapterView<?> arg0, View view,
+                                            int position, long id) {
+                        Intent intent = new Intent(NewsMapper.this, DisplayWebViewActivity.class);
+                        String url = newsItems.get(position).getUrl();
+                        intent.putExtra(EXTRA_URL,url);
+                        startActivity(intent);
+                    }
+                }
+        );
     }
 
     @Override
     public void onLoaderReset(Loader<List<NewsItem>> loader) {
-        final ListView listview = (ListView) findViewById(R.id.lvNews);
-        listview.setAdapter(null);
+        setContentView(R.layout.activity_news_mapper);
+        ListView lvNews = (ListView) findViewById(R.id.lvNews);
+        lvNews.setAdapter(newsAdapter);
     }
     @Override
     protected void onStop() {
@@ -96,7 +130,7 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
         super.onStop();
     }
 
-    //Check for Google Play Services
+    // Check for Google Play Services
     // Global constants
     /*
      * Define a request code to send to Google Play services

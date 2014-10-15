@@ -30,16 +30,20 @@ public class NewsItemRequest extends AsyncTaskLoader<List<NewsItem>>{
 
     @Override
     public List<NewsItem> loadInBackground() {
-
+        //Create new input stream
         try {
             URL url = new URL("http://7e31faa.ngrok.com/api/location?latlng="+location);
             is = url.openConnection().getInputStream();
         }
         catch (MalformedURLException e) {e.printStackTrace();}
         catch (IOException e) {e.printStackTrace();}
+
+        //get JsonArray from inputStream
         JsonReader rdr = Json.createReader(is);
         JsonObject obj = rdr.readObject();
         JsonArray newsArray  = obj.getJsonArray("news");
+
+        //parse JsonArray and create a list of new NewsItems
         List<NewsItem> newsItems = new ArrayList<NewsItem>();
         for (int i = 0; i < newsArray.size(); i++)
             newsItems.add(new NewsItem(newsArray.getJsonObject(i)));

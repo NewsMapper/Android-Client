@@ -62,6 +62,6 @@ public class NewsItem {
 
     public String toString()
     {
-        return String.format("%s published by %s on %s at %. Summary: %s", title, publisher, publishedDate, url, summary);
+        return String.format("%s published by %s on %s at %s. Summary: %s", title, publisher, publishedDate, url, summary);
     }
 }
