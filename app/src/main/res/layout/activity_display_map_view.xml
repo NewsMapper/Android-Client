@@ -3,13 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    tools:context="com.example.danielmargosian.newsmapper.DisplayWebViewActivity">
+    tools:context="com.example.danielmargosian.newsmapper.DisplayMapView">
 
-    <WebView
-        android:id = "@+id/mWebView"
+    <com.google.android.gms.maps.MapView
+        android:id = "@+id/mMapView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:scrollbars = "none">
-    </WebView>
+    </com.google.android.gms.maps.MapView>
 
 </RelativeLayout>

@@ -3,7 +3,6 @@ package com.example.danielmargosian.newsmapper;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.ListActivity;
 import android.app.LoaderManager;
 import android.content.AsyncTaskLoader;
 import android.content.Intent;
@@ -15,18 +14,14 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,21 +59,29 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.news_mapper, menu);
-        return true;
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.news_mapper, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.action_map:
+                openMap();
+                return true;
+            case R.id.action_settings:
+                //openSettings();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
+    }
 
-        return super.onOptionsItemSelected(item);
+    public void openMap() {
+        Intent intent = new Intent(NewsMapper.this, DisplayMapView.class);
+        startActivity(intent);
     }
 
     @Override
@@ -106,8 +109,7 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
                 new AdapterView.OnItemClickListener()
                 {
                     @Override
-                    public void onItemClick(AdapterView<?> arg0, View view,
-                                            int position, long id) {
+                    public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
                         Intent intent = new Intent(NewsMapper.this, DisplayWebViewActivity.class);
                         String url = newsItems.get(position).getUrl();
                         intent.putExtra(EXTRA_URL,url);
@@ -131,11 +133,6 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
     }
 
     // Check for Google Play Services
-    // Global constants
-    /*
-     * Define a request code to send to Google Play services
-     * This code is returned in Activity.onActivityResult
-     */
     private final static int
             CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 

@@ -32,7 +32,7 @@ public class NewsItemRequest extends AsyncTaskLoader<List<NewsItem>>{
     public List<NewsItem> loadInBackground() {
         //Create new input stream
         try {
-            URL url = new URL("http://7e31faa.ngrok.com/api/location?latlng="+location);
+            URL url = new URL("http://d91587a.ngrok.com/api/location?latlng="+location);
             is = url.openConnection().getInputStream();
         }
         catch (MalformedURLException e) {e.printStackTrace();}
@@ -47,6 +47,8 @@ public class NewsItemRequest extends AsyncTaskLoader<List<NewsItem>>{
         List<NewsItem> newsItems = new ArrayList<NewsItem>();
         for (int i = 0; i < newsArray.size(); i++)
             newsItems.add(new NewsItem(newsArray.getJsonObject(i)));
+        NewsItem website = new NewsItem(null,null,null,"NewsMapper.me","http://newsmapper.me");
+        newsItems.add(website);
         return newsItems;
     }
 }

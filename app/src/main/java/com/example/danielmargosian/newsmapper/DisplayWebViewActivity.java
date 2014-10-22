@@ -26,7 +26,6 @@ public class DisplayWebViewActivity extends Activity {
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true); //?
-        System.out.println("URL: "+ url);
         mWebView.loadUrl(url);
     }
 
