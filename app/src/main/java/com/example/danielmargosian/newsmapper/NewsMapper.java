@@ -80,7 +80,7 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
     }
 
     public void openMap() {
-        Intent intent = new Intent(NewsMapper.this, DisplayMapView.class);
+        Intent intent = new Intent(NewsMapper.this, DisplayMapViewActivity.class);
         startActivity(intent);
     }
 
