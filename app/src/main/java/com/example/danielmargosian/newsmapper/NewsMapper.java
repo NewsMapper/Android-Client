@@ -38,8 +38,12 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
     private List<NewsItem> newsItems;
     private ArrayAdapter<Spanned> newsAdapter;
     private String location;
+    private double lat;
+    private double lon;
 
     public static final String EXTRA_URL = "com.example.danielmargosian.newsmapper.URL";
+    public static final String EXTRA_LONGITUDE = "com.example.danielmargosian.newsmapper.LONGITUDE";
+    public static final String EXTRA_LATITUDE = "com.example.danielmargosian.newsmapper.LATITUDE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +85,8 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
 
     public void openMap() {
         Intent intent = new Intent(NewsMapper.this, DisplayMapViewActivity.class);
+        intent.putExtra(EXTRA_LATITUDE, lat);
+        intent.putExtra(EXTRA_LONGITUDE, lon);
         startActivity(intent);
     }
 
@@ -225,8 +231,8 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
         // Display the connection status
         Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
         mCurrentLocation = mLocationClient.getLastLocation();
-        double lat = mCurrentLocation.getLatitude();
-        double lon = mCurrentLocation.getLongitude();
+        lat = mCurrentLocation.getLatitude();
+        lon = mCurrentLocation.getLongitude();
         location = String.valueOf(lat) + "," + String.valueOf(lon);
         getLoaderManager().initLoader(0, null, this).forceLoad();
 

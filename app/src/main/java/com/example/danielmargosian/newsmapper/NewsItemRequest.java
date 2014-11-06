@@ -32,7 +32,7 @@ public class NewsItemRequest extends AsyncTaskLoader<List<NewsItem>>{
     public List<NewsItem> loadInBackground() {
         //Create new input stream
         try {
-            URL url = new URL("http://58eac842.ngrok.com/api/location?latlng="+location);
+            URL url = new URL("http://30f74c6f.ngrok.com/api/location?latlng="+location);
             is = url.openConnection().getInputStream();
         }
         catch (MalformedURLException e) {e.printStackTrace();}
