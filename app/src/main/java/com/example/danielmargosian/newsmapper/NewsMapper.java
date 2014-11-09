@@ -30,6 +30,7 @@ import com.google.android.gms.common.ErrorDialogFragment;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.maps.model.LatLng;
 
 public class NewsMapper extends Activity implements LoaderManager.LoaderCallbacks<List<NewsItem>>, GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
 
@@ -39,7 +40,7 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
     private ArrayAdapter<Spanned> newsAdapter;
     private String location;
     private double lat;
-    private double lon;
+    private double lng;
 
     public static final String EXTRA_URL = "com.example.danielmargosian.newsmapper.URL";
     public static final String EXTRA_LONGITUDE = "com.example.danielmargosian.newsmapper.LONGITUDE";
@@ -49,15 +50,22 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
     protected void onCreate(Bundle savedInstanceState) {
         //start the activity and the location client
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_news_mapper);
-        mLocationClient = new LocationClient(this, this, this);
+        setContentView(R.layout.activity_news_mapper);mLocationClient = new LocationClient(this, this, this);
 
     }
     @Override
     protected void onStart() {
         super.onStart();
+        Intent intent = getIntent();
+        if (intent.getBooleanExtra(DisplayMapViewActivity.EXTRA_OPEN, false)) {
+            lat = intent.getDoubleExtra(DisplayMapViewActivity.EXTRA_LAT, 40.101953);
+            lng = intent.getDoubleExtra(DisplayMapViewActivity.EXTRA_LNG, -88.227152);
+            location = String.valueOf(lat) + "," + String.valueOf(lng);
+            getLoaderManager().initLoader(0, null, this).forceLoad();
+        }
         // Connect the client.
-        mLocationClient.connect();
+        else
+            mLocationClient.connect();
     }
 
     @Override
@@ -86,7 +94,7 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
     public void openMap() {
         Intent intent = new Intent(NewsMapper.this, DisplayMapViewActivity.class);
         intent.putExtra(EXTRA_LATITUDE, lat);
-        intent.putExtra(EXTRA_LONGITUDE, lon);
+        intent.putExtra(EXTRA_LONGITUDE, lng);
         startActivity(intent);
     }
 
@@ -232,8 +240,8 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
         Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
         mCurrentLocation = mLocationClient.getLastLocation();
         lat = mCurrentLocation.getLatitude();
-        lon = mCurrentLocation.getLongitude();
-        location = String.valueOf(lat) + "," + String.valueOf(lon);
+        lng = mCurrentLocation.getLongitude();
+        location = String.valueOf(lat) + "," + String.valueOf(lng);
         getLoaderManager().initLoader(0, null, this).forceLoad();
 
     }

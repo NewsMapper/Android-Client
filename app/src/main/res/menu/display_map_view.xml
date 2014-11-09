@@ -1,6 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.danielmargosian.newsmapper.DisplayMapViewActivity" >
+    <item android:id="@+id/action_list"
+        android:title="@string/action_list"
+        android:icon="@drawable/ic_action_view_as_list"
+        android:showAsAction="ifRoom" />
+
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"
