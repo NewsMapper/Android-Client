@@ -10,8 +10,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import com.example.danielmargosian.newsmapper.R;
-
 public class DisplayWebViewActivity extends Activity {
 
     @Override
@@ -19,13 +17,17 @@ public class DisplayWebViewActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_web_view);
         Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show();
+        //get the desired url
         Intent intent = getIntent();
         String url = intent.getStringExtra(NewsMapper.EXTRA_URL);
+        //find the WebView
         WebView mWebView = (WebView) findViewById(R.id.mWebView);
+        //set up the WebView
         mWebView.setWebViewClient(new WebViewClient());
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true); //?
+        // load the url in the WebView
         mWebView.loadUrl(url);
     }
 

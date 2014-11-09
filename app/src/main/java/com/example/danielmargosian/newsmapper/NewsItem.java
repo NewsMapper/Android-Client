@@ -1,13 +1,6 @@
 package com.example.danielmargosian.newsmapper;
 
-import org.json.JSONArray;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.json.JsonArray;
 import javax.json.JsonObject;
-import javax.json.JsonValue;
 
 /**
  * Created by danielmargosian on 9/11/14.
@@ -18,7 +11,7 @@ public class NewsItem {
     private String summary;
     private String title;
     private String url;
-
+    //default constructor
     public NewsItem(String publishedDate, String publisher, String summary, String title, String url)
     {
         this.publishedDate = publishedDate;
@@ -27,6 +20,7 @@ public class NewsItem {
         this.title = title;
         this.url = url;
     }
+    //creates a NewsItem from a JsonObject
     public NewsItem(JsonObject jo)
     {
         publishedDate = jo.getString("publishedDate");

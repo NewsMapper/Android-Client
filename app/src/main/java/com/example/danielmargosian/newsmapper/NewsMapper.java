@@ -1,8 +1,6 @@
 package com.example.danielmargosian.newsmapper;
 
 import android.app.Activity;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.LoaderManager;
 import android.content.AsyncTaskLoader;
 import android.content.Intent;
@@ -12,7 +10,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,21 +23,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.ErrorDialogFragment;
 import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.maps.model.LatLng;
 
-public class NewsMapper extends Activity implements LoaderManager.LoaderCallbacks<List<NewsItem>>, GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
+public class NewsMapper extends Activity implements LoaderManager.LoaderCallbacks<List<NewsItem>>, GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener {
 
-    private Location mCurrentLocation;
-    private LocationClient mLocationClient;
-    private List<NewsItem> newsItems;
-    private ArrayAdapter<Spanned> newsAdapter;
-    private String location;
-    private double lat;
-    private double lng;
+    private static Location mCurrentLocation;
+    private static LocationClient mLocationClient;
+    private static List<NewsItem> newsItems;
+    private static ArrayAdapter<Spanned> newsAdapter;
+    private static String location;
+    private static double lat;
+    private static double lng;
 
     public static final String EXTRA_URL = "com.example.danielmargosian.newsmapper.URL";
     public static final String EXTRA_LONGITUDE = "com.example.danielmargosian.newsmapper.LONGITUDE";
@@ -50,20 +44,25 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
     protected void onCreate(Bundle savedInstanceState) {
         //start the activity and the location client
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_news_mapper);mLocationClient = new LocationClient(this, this, this);
+        setContentView(R.layout.activity_news_mapper);
+        mLocationClient = new LocationClient(this, this, this);
 
     }
+
     @Override
     protected void onStart() {
         super.onStart();
         Intent intent = getIntent();
+        /*this checks whether the mapView has been opened. If it has, it sets the location to the
+         *current view of the map, so the loader can get news items from the desired location
+         */
         if (intent.getBooleanExtra(DisplayMapViewActivity.EXTRA_OPEN, false)) {
             lat = intent.getDoubleExtra(DisplayMapViewActivity.EXTRA_LAT, 40.101953);
             lng = intent.getDoubleExtra(DisplayMapViewActivity.EXTRA_LNG, -88.227152);
             location = String.valueOf(lat) + "," + String.valueOf(lng);
             getLoaderManager().initLoader(0, null, this).forceLoad();
         }
-        // Connect the client.
+        //otherwise it finds the users location to give them news for their current location
         else
             mLocationClient.connect();
     }
@@ -91,6 +90,7 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
         }
     }
 
+    //starts DisplayMapViewActivity and provides it with coordinates to center on
     public void openMap() {
         Intent intent = new Intent(NewsMapper.this, DisplayMapViewActivity.class);
         intent.putExtra(EXTRA_LATITUDE, lat);
@@ -109,8 +109,7 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
         //after done loading, make a list of html formatted titles
         newsItems = list;
         List<Spanned> titleList = new ArrayList<Spanned>();
-        for (int i = 0; i < list.size(); i++)
-        {
+        for (int i = 0; i < list.size(); i++) {
             Spanned t = Html.fromHtml(list.get(i).getTitle());
             titleList.add(t);
         }
@@ -120,113 +119,30 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
         lvNews.setAdapter(newsAdapter);
         //when article title is clicked, open article in new webview activity
         lvNews.setOnItemClickListener(
-                new AdapterView.OnItemClickListener()
-                {
+                new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
                         Intent intent = new Intent(NewsMapper.this, DisplayWebViewActivity.class);
                         String url = newsItems.get(position).getUrl();
-                        intent.putExtra(EXTRA_URL,url);
+                        intent.putExtra(EXTRA_URL, url);
                         startActivity(intent);
                     }
                 }
         );
     }
-
+    //if the loader resets, set the listView adapter to the newsAdapter
     @Override
     public void onLoaderReset(Loader<List<NewsItem>> loader) {
         setContentView(R.layout.activity_news_mapper);
         ListView lvNews = (ListView) findViewById(R.id.lvNews);
         lvNews.setAdapter(newsAdapter);
     }
+
     @Override
     protected void onStop() {
         // Disconnecting the client invalidates it.
         mLocationClient.disconnect();
         super.onStop();
-    }
-
-    // Check for Google Play Services
-    private final static int
-            CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
-
-    // Define a DialogFragment that displays the error dialog
-    public static class ErrorDialogFragment extends DialogFragment {
-        // Global field to contain the error dialog
-        private Dialog mDialog;
-        // Default constructor. Sets the dialog field to null
-        public ErrorDialogFragment() {
-            super();
-            mDialog = null;
-        }
-        // Set the dialog to display
-        public void setDialog(Dialog dialog) {
-            mDialog = dialog;
-        }
-        // Return a Dialog to the DialogFragment.
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            return mDialog;
-        }
-    }
-    /*
-     * Handle results returned to the FragmentActivity
-     * by Google Play services
-     */
-    @Override
-    protected void onActivityResult(
-            int requestCode, int resultCode, Intent data) {
-        // Decide what to do based on the original request code
-        switch (requestCode) {
-            case CONNECTION_FAILURE_RESOLUTION_REQUEST :
-            /*
-             * If the result code is Activity.RESULT_OK, try
-             * to connect again
-             */
-                switch (resultCode) {
-                    case Activity.RESULT_OK :
-                    /*
-                     * Try the request again
-                     */
-                        break;
-                }
-        }
-    }
-    private boolean servicesConnected() {
-        // Check that Google Play services is available
-        int resultCode =
-                GooglePlayServicesUtil.
-                        isGooglePlayServicesAvailable(this);
-        // If Google Play services is available
-        if (ConnectionResult.SUCCESS == resultCode) {
-            // In debug mode, log the status
-            Log.d("Location Updates",
-                    "Google Play services is available.");
-            // Continue
-            return true;
-            // Google Play services was not available for some reason.
-            // resultCode holds the error code.
-        } else {
-            // Get the error dialog from Google Play services
-            Dialog errorDialog = GooglePlayServicesUtil.getErrorDialog(
-                    resultCode,
-                    this,
-                    CONNECTION_FAILURE_RESOLUTION_REQUEST);
-
-            // If Google Play services can provide an error dialog
-            if (errorDialog != null) {
-                // Create a new DialogFragment for the error dialog
-                ErrorDialogFragment errorFragment =
-                        new ErrorDialogFragment();
-                // Set the dialog in the DialogFragment
-                errorFragment.setDialog(errorDialog);
-                // Show the error dialog in the DialogFragment
-                errorFragment.show(getFragmentManager(),
-                        "Location Updates");
-            }
-
-            return false;
-        }
     }
 
     /*
@@ -288,6 +204,32 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
              */
             //TODO:Create method
             //showErrorDialog(connectionResult.getErrorCode());
+        }
+    }
+
+    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+
+    /*
+     * Handle results returned to the FragmentActivity
+     * by Google Play services
+     */
+    @Override
+    protected void onActivityResult(
+            int requestCode, int resultCode, Intent data) {
+        // Decide what to do based on the original request code
+        switch (requestCode) {
+            case CONNECTION_FAILURE_RESOLUTION_REQUEST:
+            /*
+             * If the result code is Activity.RESULT_OK, try
+             * to connect again
+             */
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                    /*
+                     * Try the request again
+                     */
+                        break;
+                }
         }
     }
 }

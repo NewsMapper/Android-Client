@@ -24,12 +24,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class DisplayMapViewActivity extends Activity {
 
-    private MapFragment mapFrag;
-    private GoogleMap map;
-    private LatLng latLng;
-    private boolean opened=false;
-    private double lat;
-    private double lng;
+    private static GoogleMap map;
 
     public static final String EXTRA_OPEN = "com.example.danielmargosian.newsmapper.OPEN";
     public static final String EXTRA_LAT = "com.example.danielmargosian.newsmapper.LAT";
@@ -38,25 +33,25 @@ public class DisplayMapViewActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_map_view);
-        mapFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-        map = mapFrag.getMap();
+        //get GoogleMap
+        map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();;
+        //Center the map on the location
         Intent intent = getIntent();
-        lat = intent.getDoubleExtra(NewsMapper.EXTRA_LATITUDE, 40.101953);
-        lng = intent.getDoubleExtra(NewsMapper.EXTRA_LONGITUDE, -88.227152);
-        latLng = new LatLng(lat, lng);
-        centerMapOnMyLocation();
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(intent.getDoubleExtra(NewsMapper.EXTRA_LATITUDE, 40.101953),
+                        intent.getDoubleExtra(NewsMapper.EXTRA_LONGITUDE, -88.227152)), 12.5f));
     }
-
+    /*
+    opens the list, supplies it the location of the current MapView of which to get the news from
+    and tells it to use that location, not the users current location by telling it MapView has
+    been opened
+    */
     public void openList() {
-        opened=true;
         Intent intent = new Intent(DisplayMapViewActivity.this, NewsMapper.class);
-        CameraPosition cameraPosition = map.getCameraPosition();
-        LatLng latLng = cameraPosition.target;
-        lat = latLng.latitude;
-        lng = latLng.longitude;
-        intent.putExtra(EXTRA_LAT, lat);
-        intent.putExtra(EXTRA_LNG, lng);
-        intent.putExtra(EXTRA_OPEN, opened);
+        LatLng latLng = map.getCameraPosition().target;
+        intent.putExtra(EXTRA_LAT, latLng.latitude);
+        intent.putExtra(EXTRA_LNG, latLng.longitude);
+        intent.putExtra(EXTRA_OPEN, true);
         startActivity(intent);
     }
 
@@ -69,9 +64,11 @@ public class DisplayMapViewActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        /*
+        Handle action bar item clicks here. The action bar will
+        automatically handle clicks on the Home/Up button, so long
+        as you specify a parent activity in AndroidManifest.xml.
+        */
         int id = item.getItemId();
         switch (item.getItemId()) {
             case R.id.action_list:
@@ -84,9 +81,4 @@ public class DisplayMapViewActivity extends Activity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-    private void centerMapOnMyLocation() {
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.5f));
-    }
-
 }
