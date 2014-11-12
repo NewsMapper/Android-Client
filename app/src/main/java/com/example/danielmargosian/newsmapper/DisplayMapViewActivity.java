@@ -17,6 +17,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Created by danielmargosian on 10/18/14.
@@ -37,9 +38,15 @@ public class DisplayMapViewActivity extends Activity {
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();;
         //Center the map on the location
         Intent intent = getIntent();
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(intent.getDoubleExtra(NewsMapper.EXTRA_LATITUDE, 40.101953),
-                        intent.getDoubleExtra(NewsMapper.EXTRA_LONGITUDE, -88.227152)), 12.5f));
+        LatLng latLng = new LatLng(intent.getDoubleExtra(NewsMapper.EXTRA_LATITUDE, 40.101953),
+                intent.getDoubleExtra(NewsMapper.EXTRA_LONGITUDE, -88.227152));
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.5f));
+        MarkerOptions mp = new MarkerOptions();
+        mp.position(latLng);
+        mp.title("Test Marker");
+        mp.draggable(false);
+        map.addMarker(mp);
+
     }
     /*
     opens the list, supplies it the location of the current MapView of which to get the news from
