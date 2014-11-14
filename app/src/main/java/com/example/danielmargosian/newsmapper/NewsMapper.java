@@ -25,20 +25,26 @@ import java.util.List;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.maps.model.LatLng;
 
-public class NewsMapper extends Activity implements LoaderManager.LoaderCallbacks<List<NewsItem>>, GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener {
+public class NewsMapper extends Activity implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener {
 
-    private static Location mCurrentLocation;
+    private static Location location;
     private static LocationClient mLocationClient;
-    private static List<NewsItem> newsItems;
+    private static List<Subreddit> subreddits;
+    private static List<Subreddit> subredditsLocationIn;
     private static ArrayAdapter<Spanned> newsAdapter;
-    private static String location;
+    private static String locationString;
     private static double lat;
     private static double lng;
 
     public static final String EXTRA_URL = "com.example.danielmargosian.newsmapper.URL";
     public static final String EXTRA_LONGITUDE = "com.example.danielmargosian.newsmapper.LONGITUDE";
     public static final String EXTRA_LATITUDE = "com.example.danielmargosian.newsmapper.LATITUDE";
+
+
+    private static final int REDDIT_LOCATIONS_REQUEST_LOADER_ID = 0;
+    private static final int SUBBREDIT_TOPIC_LOADER_ID= 1 ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +65,8 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
         if (intent.getBooleanExtra(DisplayMapViewActivity.EXTRA_OPEN, false)) {
             lat = intent.getDoubleExtra(DisplayMapViewActivity.EXTRA_LAT, 40.101953);
             lng = intent.getDoubleExtra(DisplayMapViewActivity.EXTRA_LNG, -88.227152);
-            location = String.valueOf(lat) + "," + String.valueOf(lng);
-            getLoaderManager().initLoader(0, null, this).forceLoad();
+            locationString = String.valueOf(lat) + "," + String.valueOf(lng);
+            getLoaderManager().initLoader(REDDIT_LOCATIONS_REQUEST_LOADER_ID, null, RedditLocationsRequestLoaderListener).forceLoad();
         }
         //otherwise it finds the users location to give them news for their current location
         else
@@ -98,45 +104,56 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
         startActivity(intent);
     }
 
-    @Override
-    public AsyncTaskLoader<List<NewsItem>> onCreateLoader(int id, Bundle args) {
-        //creates new NewsItemRequest for the loader
-        return new NewsItemRequest(this, location);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<List<NewsItem>> loader, List<NewsItem> list) {
-        //after done loading, make a list of html formatted titles
-        newsItems = list;
-        List<Spanned> titleList = new ArrayList<Spanned>();
-        for (int i = 0; i < list.size(); i++) {
-            Spanned t = Html.fromHtml(list.get(i).getTitle());
-            titleList.add(t);
+    private LoaderManager.LoaderCallbacks<List<Subreddit>> RedditLocationsRequestLoaderListener
+            = new LoaderManager.LoaderCallbacks<List<Subreddit>>() {
+        @Override
+        public AsyncTaskLoader<List<Subreddit>> onCreateLoader(int id, Bundle args) {
+            //creates new NewsItemRequest for the loader
+            return new RedditLocationsRequest(NewsMapper.this);
         }
-        //create an ArrayAdapter using the titleList and set it to display on the listview;
-        newsAdapter = new ArrayAdapter<Spanned>(this, android.R.layout.simple_list_item_1, titleList);
-        ListView lvNews = (ListView) findViewById((R.id.lvNews));
-        lvNews.setAdapter(newsAdapter);
-        //when article title is clicked, open article in new webview activity
-        lvNews.setOnItemClickListener(
-                new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
-                        Intent intent = new Intent(NewsMapper.this, DisplayWebViewActivity.class);
-                        String url = newsItems.get(position).getUrl();
-                        intent.putExtra(EXTRA_URL, url);
-                        startActivity(intent);
+
+        @Override
+        public void onLoadFinished(Loader<List<Subreddit>> loader, List<Subreddit> list) {
+            //after done loading, make a list of html formatted titles
+            subreddits = list;
+            subredditsLocationIn = new ArrayList<Subreddit>();
+            LatLng latLng = new LatLng(lat, lng);
+            for (int i = 0; i < subreddits.size(); i++) {
+                if (subreddits.get(i).getBoundary().contains(latLng))
+                    subredditsLocationIn.add(subreddits.get(i));
+            }
+            /*List<Spanned> titleList = new ArrayList<Spanned>();
+            for (int i = 0; i < list.size(); i++) {
+                Spanned t = Html.fromHtml(list.get(i).getTitle());
+                titleList.add(t);
+            }
+            //create an ArrayAdapter using the titleList and set it to display on the listview;
+            newsAdapter = new ArrayAdapter<Spanned>(this, android.R.layout.simple_list_item_1, titleList);
+            ListView lvNews = (ListView) findViewById((R.id.lvNews));
+            lvNews.setAdapter(newsAdapter);
+            //when article title is clicked, open article in new webview activity
+            lvNews.setOnItemClickListener(
+                    new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+                            Intent intent = new Intent(NewsMapper.this, DisplayWebViewActivity.class);
+                            String url = newsItems.get(position).getUrl();
+                            intent.putExtra(EXTRA_URL, url);
+                            startActivity(intent);
+                        }
                     }
-                }
-        );
-    }
-    //if the loader resets, set the listView adapter to the newsAdapter
-    @Override
-    public void onLoaderReset(Loader<List<NewsItem>> loader) {
-        setContentView(R.layout.activity_news_mapper);
-        ListView lvNews = (ListView) findViewById(R.id.lvNews);
-        lvNews.setAdapter(newsAdapter);
-    }
+            );
+            */
+        }
+
+        //if the loader resets, set the listView adapter to the newsAdapter
+        @Override
+        public void onLoaderReset(Loader<List<Subreddit>> loader) {
+            setContentView(R.layout.activity_news_mapper);
+            ListView lvNews = (ListView) findViewById(R.id.lvNews);
+            lvNews.setAdapter(newsAdapter);
+        }
+    };
 
     @Override
     protected void onStop() {
@@ -154,11 +171,11 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
     public void onConnected(Bundle dataBundle) {
         // Display the connection status
         Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
-        mCurrentLocation = mLocationClient.getLastLocation();
-        lat = mCurrentLocation.getLatitude();
-        lng = mCurrentLocation.getLongitude();
-        location = String.valueOf(lat) + "," + String.valueOf(lng);
-        getLoaderManager().initLoader(0, null, this).forceLoad();
+        location = mLocationClient.getLastLocation();
+        lat = location.getLatitude();
+        lng = location.getLongitude();
+        locationString = String.valueOf(lat) + "," + String.valueOf(lng);
+        getLoaderManager().initLoader(SUBBREDIT_TOPIC_LOADER_ID, null, RedditLocationsRequestLoaderListener).forceLoad();
 
     }
     /*
