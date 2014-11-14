@@ -11,7 +11,7 @@ public class SubredditTopic {
     private String url;
 
     public SubredditTopic(JsonObject jo) {
-        title = jo.getString("title","text");
+        title = jo.getString("title", "text");
         title = jo.getString("title", "link");
 
     }
