@@ -6,12 +6,20 @@ import javax.json.JsonObject;
  * Created by danielmargosian on 9/11/14.
  */
 public class NewsItem {
-    private String publishedDate;
-    private String publisher;
-    private String summary;
-    private String title;
-    private String url;
+    protected String publishedDate;
+    protected String publisher;
+    protected String summary;
+    protected String title;
+    protected String url;
     //default constructor
+    public NewsItem() {
+        publishedDate=null;
+        publisher=null;
+        summary=null;
+        title=null;
+        url=null;
+    }
+
     public NewsItem(String publishedDate, String publisher, String summary, String title, String url)
     {
         this.publishedDate = publishedDate;

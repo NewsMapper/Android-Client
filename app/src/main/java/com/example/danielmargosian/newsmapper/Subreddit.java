@@ -26,6 +26,7 @@ public class Subreddit {
         rid = jo.getString("rid");
     }
 
+    public String getName() {return name;}
     public String getRid() {
         return rid;
     }

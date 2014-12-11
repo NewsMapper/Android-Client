@@ -27,14 +27,14 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.maps.model.LatLng;
 
-public class NewsMapper extends Activity implements LoaderManager.LoaderCallbacks<List<SubredditTopic>>, GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener {
+public class NewsMapper extends Activity implements LoaderManager.LoaderCallbacks<List<NewsItem>>, GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener {
 
     private static Location location;
     private static LocationClient mLocationClient;
-    private static ArrayAdapter<String> newsAdapter;
+    private static ArrayAdapter<Spanned> newsAdapter;
     private static double lat;
     private static double lng;
-    private static List<SubredditTopic> topics;
+    private static List<NewsItem> topics;
 
     public static final String EXTRA_URL = "com.example.danielmargosian.newsmapper.URL";
     public static final String EXTRA_LONGITUDE = "com.example.danielmargosian.newsmapper.LONGITUDE";
@@ -97,22 +97,22 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
         startActivity(intent);
     }
     @Override
-    public AsyncTaskLoader<List<SubredditTopic>> onCreateLoader(int id, Bundle args) {
+    public AsyncTaskLoader<List<NewsItem>> onCreateLoader(int id, Bundle args) {
             //creates new NewsItemRequest for the loader
             LatLng latLng = new LatLng(lat,lng);
             return new SubredditRequest(NewsMapper.this,latLng);
         }
 
         @Override
-        public void onLoadFinished(Loader<List<SubredditTopic>> loader, List<SubredditTopic> list) {
+        public void onLoadFinished(Loader<List<NewsItem>> loader, List<NewsItem> list) {
             //after done loading, make a list of html formatted titles
             topics = list;
-            List<String> titleList = new ArrayList<String>();
+            List<Spanned> titleList = new ArrayList<Spanned>();
             for (int i = 0; i < list.size(); i++) {
                 String s = list.get(i).getTitle();
-                titleList.add(s);
+                titleList.add(Html.fromHtml(s));
             //create an ArrayAdapter using the titleList and set it to display on the listview;
-            newsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, titleList);
+            newsAdapter = new ArrayAdapter<Spanned>(this, android.R.layout.simple_list_item_1, titleList);
             ListView lvNews = (ListView) findViewById((R.id.lvNews));
             lvNews.setAdapter(newsAdapter);
             //when article title is clicked, open article in new webview activity
@@ -132,7 +132,7 @@ public class NewsMapper extends Activity implements LoaderManager.LoaderCallback
 
         //if the loader resets, set the listView adapter to the newsAdapter
         @Override
-        public void onLoaderReset(Loader<List<SubredditTopic>> loader) {
+        public void onLoaderReset(Loader<List<NewsItem>> loader) {
             setContentView(R.layout.activity_news_mapper);
             ListView lvNews = (ListView) findViewById(R.id.lvNews);
             lvNews.setAdapter(newsAdapter);
