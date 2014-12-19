@@ -41,62 +41,62 @@ public class SubredditRequest extends AsyncTaskLoader<List<NewsItem>> {
             }
         };
         try {
-            URL url = new URL("http://5a368771.ngrok.com/reddit_api/r");
+            URL url = new URL("http://7c4a8d8e.ngrok.com/reddit_api/r");
             is = url.openConnection().getInputStream();
         }
         catch (MalformedURLException e) {e.printStackTrace();}
         catch (IOException e) {e.printStackTrace();}
 
-        //get JsonArray from inputStream
+        //parse list of all geolocated subreddits
         JsonReader rdr = Json.createReader(is);
         JsonObject obj = rdr.readObject();
         JsonArray subredditsArray  = obj.getJsonArray("subreddits");
 
+        //add subreddits that are close to the users location to the list
         List<Subreddit> subreddits = new ArrayList<Subreddit>();
-        for (int i = 0; i < subredditsArray.size(); i++)
-            subreddits.add(new Subreddit(subredditsArray.getJsonObject(i)));
-
-        List<Subreddit> subredditsLocationIn = new ArrayList<Subreddit>();
-        for (int i = 0; i < subreddits.size(); i++) {
-            Subreddit subreddit = subreddits.get(i);
+        for (int i = 0; i < subredditsArray.size(); i++) {
+            Subreddit subreddit = new Subreddit(subredditsArray.getJsonObject(i));
             if (subreddit.getBoundary().contains(latLng) && !subreddit.getName().equals("america"))
-                subredditsLocationIn.add(subreddits.get(i));
+                subreddits.add(subreddit);
         }
 
+        //get list of topics from each subreddit
         List<NewsItem> topics = new ArrayList<NewsItem>();
-        for (int i=0;i<subredditsLocationIn.size();i++) {
+        for (int i=0;i<subreddits.size();i++) {
             try {
-                URL url = new URL("http://5a368771.ngrok.com/reddit_api/r/" + subredditsLocationIn.get(i).getRid());
+                URL url = new URL("http://7c4a8d8e.ngrok.com/reddit_api/r/" + subreddits.get(i).getRid());
                 is = url.openConnection().getInputStream();
             }
             catch (MalformedURLException e) {e.printStackTrace();}
             catch (IOException e) {e.printStackTrace();}
 
+            //parse list of all topics from each individual subreddit
             rdr = Json.createReader(is);
             obj = rdr.readObject();
             JsonArray topicsArray  = obj.getJsonArray("topics");
 
+            //add them to the list
             for (int j = 0; j < topicsArray.size(); j++) {
                 topics.add(new SubredditTopic(topicsArray.getJsonObject(j)));
             }
         }
 
+        //get all news articles related to the users location
         try {
-            URL url = new URL("http://5bd3457.ngrok.com/api/location?latlng="+latLng.latitude+","+latLng.longitude);
-            URLConnection c = url.openConnection();
-            is = c.getInputStream();
+            URL url = new URL("http://13d8a794.ngrok.com/api/location?latlng="+latLng.latitude+","+latLng.longitude);
+            is = url.openConnection().getInputStream();
         }
         catch (MalformedURLException e) {e.printStackTrace();}
         catch (IOException e) {e.printStackTrace();}
 
-        //get JsonArray from inputStream
         rdr = Json.createReader(is);
         obj = rdr.readObject();
         JsonArray newsArray  = obj.getJsonArray("news");
 
-        //parse JsonArray and create a list of new NewsItems
+        //add articles to the list
         for (int i = 0; i < newsArray.size(); i++)
             topics.add(new NewsItem(newsArray.getJsonObject(i)));
+
         return topics;
     }
 }
